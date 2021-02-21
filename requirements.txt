@@ -1,0 +1,2 @@
+genshinstats-api
+flask
