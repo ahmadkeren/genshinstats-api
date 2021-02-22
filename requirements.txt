@@ -1,3 +1,5 @@
 genshinstats-api
 flask
+flask-caching
+flask-cors
 gunicorn
