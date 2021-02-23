@@ -98,8 +98,8 @@ def characters(uid: int, character_name: str=None, field: str=None):
         return jsonify(chars)
     char = find_one(chars,name=character_name)
     if field is None:
-        return char
-    return char[field]
+        return jsonify(char)
+    return jsonify(char[field])
 
 if __name__ == '__main__':
     app.run(port=5000, threaded=True)
