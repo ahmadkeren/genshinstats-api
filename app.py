@@ -11,14 +11,14 @@ gs.set_cookie(account_id=os.environ["GS_ACCOUNT_ID"], cookie_token=os.environ["G
 app = Flask(__name__)
 app.config.update({
     # "DEBUG": True,
-    'JSON_SORT_KEYS': False, # bad idea?
-    
+    "JSON_SORT_KEYS": False, # bad idea?
     "CACHE_TYPE": "simple",
     "CACHE_DEFAULT_TIMEOUT": 3600 # 1 hour
 })
 app.url_map.strict_slashes = False
 cache = Cache(app)
 CORS(app)
+class InvalidEnum(Exception): ...
 
 @cache.memoize()
 def get_user_info(uid: int):
@@ -38,7 +38,7 @@ def find_one(data, **kwargs):
     data = CaseInsensitiveDict({i[key]:i for i in data})
     if value in data:
         return data[value]
-    raise type('InvalidEnum',Exception)(f'"{value}" is not a valid Enum for "{key}", must be one of [{", ".join(data)}]')
+    raise InvalidEnum(f"'{value}' is not a valid Enum for '{key}', must be one of [{', '.join(data)}]")
 
 
 @app.route('/')
@@ -50,10 +50,13 @@ def endpoints():
     return {'endpoints':[f"'{rule.rule}' -> {rule.endpoint}" for rule in app.url_map.iter_rules()]}
 
 @app.route('/user')
+@app.route('/spiral_abyss')
+@app.route('/characters')
+def no_user_provided():
+    return {"error":'MisssingUID',"message":'No UID provided.'}, 400
+
 @app.route('/user/<int:uid>')
-def user_all(uid: int=None):
-    if uid is None:
-        raise gs.InvalidUID('No UID was provided')
+def user_all(uid: int):
     return get_user_info(uid)
 
 @app.route('/user/<int:uid>/stats')
@@ -100,6 +103,16 @@ def characters(uid: int, character_name: str=None, field: str=None):
     if field is None:
         return jsonify(char)
     return jsonify(char[field])
+
+@app.errorhandler(Exception)
+def server_error_handler(e):
+    if isinstance(e,gs.DataNotPublic):
+        status = 403
+    elif isinstance(e,(gs.GenshinStatsException,InvalidEnum)):
+        status = 400
+    else:
+        status = 500
+    return {'error':e.__class__.__name__,'message':e.args[0]}, status
 
 if __name__ == '__main__':
     app.run(port=5000, threaded=True)
