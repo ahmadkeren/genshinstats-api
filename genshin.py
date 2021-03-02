@@ -9,12 +9,12 @@ cache = Cache()
 
 @cache.memoize()
 def get_user_info(uid: int):
-    return gs.prettify_user_info(gs.get_user_info(uid))
+    return gs.get_user_info(uid)
 
 @cache.memoize()
 def get_spiral_abyss(uid: int, previous: bool=False):
-    return gs.prettify_spiral_abyss(gs.get_spiral_abyss(uid,previous))
+    return gs.get_spiral_abyss(uid,previous)
 
 @cache.memoize()
 def get_characters(uid: int):
-    return gs.prettify_characters(gs.get_all_characters(uid))
+    return gs.get_all_characters(uid)
