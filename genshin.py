@@ -18,3 +18,9 @@ def get_spiral_abyss(uid: int, previous: bool=False):
 @cache.memoize()
 def get_characters(uid: int):
     return gs.get_all_characters(uid)
+
+@cache.memoize(60*60*12)
+def get_gacha_details():
+    with open('gacha_banners.txt') as file:
+        banners = file.read().splitlines()
+    return [gs.get_gacha_details(i) for i in banners]

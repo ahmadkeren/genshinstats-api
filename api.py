@@ -1,8 +1,8 @@
-from flask import redirect, Blueprint, request, jsonify
+import genshinstats.errors as gs
+from flask import Blueprint, jsonify, redirect, request
 from requests.structures import CaseInsensitiveDict
 
-from genshin import get_user_info,get_spiral_abyss,get_characters
-import genshinstats.errors as gs
+from genshin import *
 
 api = Blueprint('api',__name__,url_prefix='/api')
 
@@ -38,6 +38,18 @@ def characters(uid: int, character_name: str=None):
     if character_name is None:
         return jsonify(chars)
     return find_one(chars,name=character_name)
+
+@api.route('/characters/<int:uid>/items')
+def character_items(uid: int):
+    chars = get_characters(uid)
+    return {
+        'weapons': [{**c['weapon'],'equipped_by':c['id']} for c in chars],
+        'artifacts': [{**i,'equipped_by':c['id']} for c in chars for i in c['artifacts']]
+    }
+
+@api.route('/gacha')
+def gacha():
+    return jsonify(get_gacha_details())
 
 @api.errorhandler(Exception)
 def server_error_handler(e):
