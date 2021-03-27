@@ -22,7 +22,8 @@ def index():
     return {
         'api': api.url_prefix,
         'docs': url_for('api.docs'),
-        'endpoints':[f"'{rule.rule}' -> {rule.endpoint}" for rule in app.url_map.iter_rules()],
+        'github': "https://github.com/thesadru/genshinstats-api",
+        'endpoints':[rule.rule for rule in app.url_map.iter_rules()],
     }
 
 
