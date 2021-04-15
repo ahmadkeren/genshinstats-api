@@ -51,6 +51,13 @@ def character_items(uid: int):
 def gacha():
     return jsonify(get_gacha_details())
 
+@api.route('/gachalog')
+def gachalog():
+    authkey = request.args.get('authkey')
+    if authkey is None:
+        raise gs.MissingAuthKey('An authkey must be given as a parameter.')
+    return jsonify(get_gacha_log(authkey))
+
 @api.errorhandler(Exception)
 def server_error_handler(e):
     if isinstance(e,gs.DataNotPublic):

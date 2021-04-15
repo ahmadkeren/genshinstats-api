@@ -1,4 +1,4 @@
-genshinstats==1.3.3
+genshinstats==1.3.9
 flask
 flask-caching
 flask-cors
