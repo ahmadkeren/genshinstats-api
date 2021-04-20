@@ -1,7 +1,6 @@
 import os
 
 import genshinstats as gs
-from flask import request
 from flask_caching import Cache
 
 gs.set_cookie(account_id=os.environ["GS_ACCOUNT_ID"], cookie_token=os.environ["GS_COOKIE_TOKEN"])
@@ -18,17 +17,24 @@ def get_spiral_abyss(uid: int, previous: bool=False):
 
 @cache.memoize()
 def get_characters(uid: int):
-    lang = request.args.get('lang','en-us')
-    return gs.get_all_characters(uid,lang=lang)
+    characters = get_user_info(uid)['characters']
+    ids = [i['id'] for i in characters]
+    return gs.get_characters(uid,ids)
+
+@cache.memoize()
+def get_gacha_log(authkey: str, size: int=60, gacha_type: str=None):
+    if gacha_type is None:
+        g = gs.get_entire_gacha_log(size,authkey=authkey)
+    else:
+        g = gs.get_gacha_log(gacha_type,size,authkey=authkey)
+    return list(g)
 
 @cache.memoize(60*60*12)
 def get_gacha_details():
-    lang = request.args.get('lang','en-us')
     with open('gacha_banners.txt') as file:
         banners = file.read().splitlines()
-    return [gs.get_gacha_details(i,lang=lang) for i in banners]
+    return [gs.get_gacha_details(i) for i in banners]
 
-@cache.memoize()
-def get_gacha_log(authkey: str):
-    lang = request.args.get('lang','en-us')
-    return list(gs.get_entire_gacha_log(60,authkey=authkey,lang=lang))
+@cache.memoize(60*60*12)
+def get_gacha_items():
+    return gs.get_gacha_items()

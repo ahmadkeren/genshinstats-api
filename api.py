@@ -47,16 +47,23 @@ def character_items(uid: int):
         'artifacts': [{**i,'equipped_by':c['id']} for c in chars for i in c['artifacts']]
     }
 
+@api.route('/gachalog')
+def gachalog():
+    authkey = request.args.get('authkey')
+    size = request.args.get('size',60,type=int)
+    gacha_type = request.args.get('gacha_type')
+    if authkey is None:
+        raise gs.MissingAuthKey('An authkey must be given as a parameter.')
+    return jsonify(get_gacha_log(authkey,size,gacha_type))
+
 @api.route('/gacha')
 def gacha():
     return jsonify(get_gacha_details())
 
-@api.route('/gachalog')
-def gachalog():
-    authkey = request.args.get('authkey')
-    if authkey is None:
-        raise gs.MissingAuthKey('An authkey must be given as a parameter.')
-    return jsonify(get_gacha_log(authkey))
+@api.route('/gacha/items')
+def gacha_items():
+    return jsonify(get_gacha_items())
+
 
 @api.errorhandler(Exception)
 def server_error_handler(e):
