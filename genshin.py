@@ -3,7 +3,7 @@ import os
 import genshinstats as gs
 from flask_caching import Cache
 
-gs.set_cookie(account_id=os.environ["GS_ACCOUNT_ID"], cookie_token=os.environ["GS_COOKIE_TOKEN"])
+gs.session.cookies.update(dict(account_id=os.environ["GS_ACCOUNT_ID"], cookie_token=os.environ["GS_COOKIE_TOKEN"]))
 
 cache = Cache()
 
