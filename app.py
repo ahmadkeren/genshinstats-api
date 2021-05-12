@@ -12,10 +12,11 @@ app.config.update({
     "CACHE_TYPE": "simple",
     "CACHE_DEFAULT_TIMEOUT": 3600 # 1 hour
 })
+app.register_blueprint(api)
+
 cache.init_app(app)
 CORS(app)
 
-app.register_blueprint(api)
 
 @app.route('/')
 def index():
@@ -23,11 +24,12 @@ def index():
         'api': api.url_prefix,
         'docs': url_for('api.docs'),
         'github': "https://github.com/thesadru/genshinstats-api",
-        'endpoints':[rule.rule for rule in app.url_map.iter_rules()],
+        'endpoints': [rule.rule for rule in app.url_map.iter_rules()],
     }
 
 
 if __name__ == '__main__':
     if os.name == 'nt':
-        import colorama;colorama.init()
-    app.run(port=5000, threaded=True)
+        import colorama
+        colorama.init()
+    app.run(port=5000, threaded=True, debug=False)

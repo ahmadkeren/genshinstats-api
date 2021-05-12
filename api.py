@@ -1,26 +1,33 @@
 import genshinstats.errors as gs
 from flask import Blueprint, jsonify, redirect, request
 from requests.structures import CaseInsensitiveDict
+import traceback
 
 from genshin import *
 
-api = Blueprint('api',__name__,url_prefix='/api')
+api = Blueprint('api', __name__, url_prefix='/api')
 
-class InvalidEnum(Exception): ...
+
+class InvalidEnum(Exception):
+    pass
+
+
 def find_one(data, **kwargs):
     """Takes in a list of dicts and a keyword, returns a dict."""
-    key,value = next(iter(kwargs.items()))
+    key, value = kwargs.popitem()
+    
     if value is None:
-        raise InvalidEnum(f"No Enum argument was provided, must be one of [{', '.join(data)}]",list(data))
-    data = CaseInsensitiveDict({i[key]:i for i in data})
+        raise InvalidEnum(f"No Enum argument was provided, must be one of: {', '.join(data)}", list(data))
+    data = CaseInsensitiveDict({i[key]: i for i in data})
     if value in data:
         return data[value]
-    raise InvalidEnum(f"'{value}' is not a valid Enum for '{key}', must be one of [{', '.join(data)}]",list(data))
+    raise InvalidEnum(f"'{value}' is not a valid Enum for '{key}', must be one of {', '.join(data)}", list(data))
 
 
 @api.route('/docs')
 def docs():
     return redirect('https://app.swaggerhub.com/apis-docs/thesadru/genshinstats-api/1.0.0')
+
 
 @api.route('/user/<int:uid>')
 def user(uid: int):
@@ -28,33 +35,35 @@ def user(uid: int):
 
 @api.route('/spiral_abyss/<int:uid>')
 def spiral_abyss(uid: int):
-    previous = request.args.get('previous')=='true'
+    previous = request.args.get('previous').lower() == 'true'
     return get_spiral_abyss(uid, previous)
 
 @api.route('/characters/<int:uid>')
 @api.route('/characters/<int:uid>/<character_name>')
-def characters(uid: int, character_name: str=None):
+def characters(uid: int, character_name: str = None):
     chars = get_characters(uid)
     if character_name is None:
         return jsonify(chars)
-    return find_one(chars,name=character_name)
+    return find_one(chars, name=character_name)
 
 @api.route('/characters/<int:uid>/items')
 def character_items(uid: int):
     chars = get_characters(uid)
     return {
-        'weapons': [{**c['weapon'],'equipped_by':c['id']} for c in chars],
-        'artifacts': [{**i,'equipped_by':c['id']} for c in chars for i in c['artifacts']]
+        'weapons': [{**c['weapon'], 'equipped_by':c['id']} for c in chars],
+        'artifacts': [{**i, 'equipped_by':c['id']} for c in chars for i in c['artifacts']]
     }
+
 
 @api.route('/gachalog')
 def gachalog():
     authkey = request.args.get('authkey')
-    size = request.args.get('size',60,type=int)
+    size = request.args.get('size', 60, type=int)
     gacha_type = request.args.get('gacha_type')
+    end_id = request.args.get('end_id', 0, type=int)
     if authkey is None:
         raise gs.MissingAuthKey('An authkey must be given as a parameter.')
-    return jsonify(get_gacha_log(authkey,size,gacha_type))
+    return jsonify(get_gacha_log(authkey, size, gacha_type, end_id))
 
 @api.route('/gacha')
 def gacha():
@@ -67,14 +76,16 @@ def gacha_items():
 
 @api.errorhandler(Exception)
 def server_error_handler(e):
-    if isinstance(e,gs.DataNotPublic):
+    if isinstance(e, gs.DataNotPublic):
         status = 403
-    elif isinstance(e,gs.GenshinStatsException):
+    elif isinstance(e, gs.GenshinStatsException):
         status = 400
     else:
         status = 500
-    return {'error':e.__class__.__name__,'message':e.args[0]}, status
+        traceback.print_exc()
+
+    return {'error':e.__class__.__name__, 'message':e.args[0]}, status
 
 @api.errorhandler(InvalidEnum)
 def invalidenum_handler(e):
-    return {'error':e.__class__.__name__,'message':e.args[0],'choices':e.args[1]}, 400
+    return {'error':e.__class__.__name__, 'message':e.args[0], 'choices':e.args[1]}, 400
