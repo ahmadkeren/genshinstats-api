@@ -1,11 +1,10 @@
 import os
-from typing import Iterable
 
 import genshinstats as gs
 from flask_caching import Cache
 from functools import partial
 
-gs.set_cookie(ltuid=os.environ["GS_LTUID"], ltoken=os.environ["GS_LTOKEN"])
+gs.set_cookie(ltuid=os.environ["GS_LTUID"], ltoken=os.environ["GS_LTOKEN"]) # type: ignore
 cache = Cache()
 
 
@@ -27,11 +26,11 @@ def get_characters(uid: int):
 
 
 def get_gacha_log(authkey: str, size: int = None, gacha_type: str = None, end_id: int = 0):
-    size = size or float('inf')
+    size = size or 1000
     # first we load the log
     data = []
     while size > 0:
-        i = cache.get(('gacha_log', authkey, end_id))
+        i: dict = cache.get(('gacha_log', authkey, end_id)) # type: ignore
         if i is None:
             break
         end_id = i['id']
