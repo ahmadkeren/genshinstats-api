@@ -1,35 +1,55 @@
-from flask import Flask, url_for
-from flask_cors import CORS
-import os
+import genshinstats as gs
+from flask import Flask, jsonify, request
+from flask import render_template
 
-from api import api
-from genshin import cache
-
+gs.set_cookie(ltuid=119480035, ltoken="cnF7TiZqHAAvYqgCBoSPx5EjwezOh1ZHoqSHf7dT")
+#uid = 710785423
 app = Flask(__name__)
-app.url_map.strict_slashes = False
-app.config.update({
-    "JSON_SORT_KEYS": False, # bad idea?
-    "CACHE_TYPE": "simple",
-    "CACHE_DEFAULT_TIMEOUT": 3600 # 1 hour
-})
-app.register_blueprint(api)
+ 
+@app.route("/")
+def hello():
+    return jsonify({"note":"Ada keperluan? silahkan hubungi Actinium..."})
 
-cache.init_app(app)
-CORS(app)
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return jsonify({"error":"End point tidak ditemukan..."}), 404
 
+@app.route("/user")
+def api_user():
+	query_parameters = request.args
+	uid = query_parameters.get("uid")
+	if uid == None:
+		return jsonify({"error":"UID belum dimasukkan!"})
+	try:
+		data = gs.get_user_stats(uid)
+		return jsonify(data)
+	except Exception as e:
+		return jsonify({"error":str(e)})
 
-@app.route('/')
-def index():
-    return {
-        'api': api.url_prefix,
-        'docs': url_for('api.docs'),
-        'github': "https://github.com/thesadru/genshinstats-api",
-        'endpoints': [rule.rule for rule in app.url_map.iter_rules()],
-    }
+@app.route("/spa")
+def api_spa():
+	query_parameters = request.args
+	uid = query_parameters.get("uid")
+	if uid == None:
+		return jsonify({"error":"UID belum dimasukkan!"})
+	try:
+		data = gs.get_spiral_abyss(uid)
+		return jsonify(data)
+	except Exception as e:
+		return jsonify({"error":str(e)})
 
-
-if __name__ == '__main__':
-    if os.name == 'nt':
-        import colorama
-        colorama.init()
-    app.run(port=5000, threaded=True, debug=False)
+@app.route("/traveler")
+def api_traveler():
+	query_parameters = request.args
+	uid = query_parameters.get("uid")
+	if uid == None:
+		return jsonify({"error":"UID belum dimasukkan!"})
+	try:
+		data = gs.get_all_user_data(uid)
+		return jsonify(data)
+	except Exception as e:
+		return jsonify({"error":str(e)})
+ 
+if __name__ == "__main__":
+    app.run()
