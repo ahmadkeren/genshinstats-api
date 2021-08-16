@@ -1,6 +1,9 @@
 import genshinstats as gs
 from flask import Flask, jsonify, request
 from flask import render_template
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 gs.set_cookie(ltuid=119480035, ltoken="cnF7TiZqHAAvYqgCBoSPx5EjwezOh1ZHoqSHf7dT")
 #uid = 710785423
