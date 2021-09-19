@@ -32,7 +32,7 @@ def api_user():
 		data = gs.get_user_stats(uid)
 		return jsonify(data)
 	except Exception as e:
-		return smart_handle_limit(e)
+		return smart_handle_limit(e, "api_user")
 
 @app.route("/spa")
 def api_spa():
@@ -44,7 +44,7 @@ def api_spa():
 		data = gs.get_spiral_abyss(uid)
 		return jsonify(data)
 	except Exception as e:
-		return smart_handle_limit(e)
+		return smart_handle_limit(e, "api_spa")
 
 @app.route("/traveler")
 def api_traveler():
@@ -56,15 +56,21 @@ def api_traveler():
 		data = gs.get_all_user_data(uid)
 		return jsonify(data)
 	except Exception as e:
-		return smart_handle_limit(e)
+		return smart_handle_limit(e, "api_traveler")
  
-def smart_handle_limit(e):
+def smart_handle_limit(e, loop_method):
 	global cookie_used, data_cookie
 	if(str(e) == "Cannnot get data for more than 30 accounts per day."):
 		if(cookie_used < len(data_cookie)-1):
 			gs.set_cookie(ltuid=data_cookie[cookie_used+1]["ltuid"], ltoken=data_cookie[cookie_used+1]["ltoken"])
 			cookie_used+=1
-			return jsonify({"success":str("COOKIE berhasil direfresh, silahkan coba lagi!")})
+			if(loop_method == "api_traveler"):
+				return api_traveler()
+			if(loop_method == "api_spa"):
+				return api_spa()
+			if(loop_method == "api_user"):
+				return api_user()
+			return jsonify({"error":str("Need refresh to get data")})
 		else:
 			gs.set_cookie(ltuid=data_cookie[0]["ltuid"], ltoken=data_cookie[0]["ltoken"])
 			cookie_used = 0;
