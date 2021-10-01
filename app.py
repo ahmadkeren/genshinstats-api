@@ -5,12 +5,20 @@ import json
 import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
-
-data = open('cookie.json',"r")
-data_cookie = json.load(data)
-cookie_used = 0 #index
-gs.set_cookie(ltuid=data_cookie[0]["ltuid"], ltoken=data_cookie[0]["ltoken"])
-#uid = 710785423
+gs.set_cookies(
+	{"ltuid": 119480035, "ltoken": "cnF7TiZqHAAvYqgCBoSPx5EjwezOh1ZHoqSHf7dT"},
+	{"ltuid": 149113841, "ltoken": "7Qbp2v4WSuQZ76zqetbJv0usM95imp9NvE6lDfW6"}, #GUI
+	{"ltuid": 25492983, "ltoken": "Dx5ibXqMljpv8rOOM1Y8MWPVlPhM1FB7khqndUWZ"}, #Ayna
+	{"ltuid": 170305200, "ltoken": "GZLBAmp58ZPkbBeKw3PTPTGLIjkK3yHdyxHhONKO"},
+	{"ltuid": 170299611, "ltoken": "kGhft0dTMnc7RAsjHLKTVrrGmXhblcF5lfCZJO81"},
+	{"ltuid": 170302702, "ltoken": "tEHeC8NLmf3QtXb1R7lknfo9GxiAiKMdNeKA3rMC"},
+	{"ltuid": 170306282, "ltoken": "tjiZwlRyAJTosNT3w0XE79ZlfUaVE5LtjQ9FvZaE"},
+	{"ltuid": 170306586, "ltoken": "W2f8iRR6DbXWAIvSciGBqqHizqee2iF0pi7O6NAA"},
+	{"ltuid": 96745167, "ltoken": "BRrxtAVyitJnntnbB4pnXx4NskvpUC9IWY7DIEmL"}, #Reza
+	{"ltuid": 40559632, "ltoken": "uPEFJZ0GlRnRJBhX1lRI8oLTzFZDZvXpcWYMezh5"}, #Bimbe
+	{"ltuid": 67128700, "ltoken": "PqExNu7ZIRorgTkZEZQpvmnfjhlykfRARvAnx5As"}, #Natsu
+	{"ltuid": 170306105, "ltoken": "a80Lt8Tq5czWlgbP4BvwRT0ZfhaqIpfRphZgHWAl"}
+)
 app = Flask(__name__)
  
 @app.route("/")
@@ -32,7 +40,7 @@ def api_user():
 		data = gs.get_user_stats(uid)
 		return jsonify(data)
 	except Exception as e:
-		return smart_handle_limit(e, "api_user")
+		return jsonify({"error":str(e)}), 404
 
 @app.route("/spa")
 def api_spa():
@@ -44,7 +52,7 @@ def api_spa():
 		data = gs.get_spiral_abyss(uid)
 		return jsonify(data)
 	except Exception as e:
-		return smart_handle_limit(e, "api_spa")
+		return jsonify({"error":str(e)}), 404
 
 @app.route("/traveler")
 def api_traveler():
@@ -56,26 +64,7 @@ def api_traveler():
 		data = gs.get_all_user_data(uid)
 		return jsonify(data)
 	except Exception as e:
-		return smart_handle_limit(e, "api_traveler")
- 
-def smart_handle_limit(e, loop_method):
-	global cookie_used, data_cookie
-	if(str(e) == "Cannnot get data for more than 30 accounts per day."):
-		if(cookie_used < len(data_cookie)-1):
-			gs.set_cookie(ltuid=data_cookie[cookie_used+1]["ltuid"], ltoken=data_cookie[cookie_used+1]["ltoken"])
-			cookie_used+=1
-			if(loop_method == "api_traveler"):
-				return api_traveler()
-			if(loop_method == "api_spa"):
-				return api_spa()
-			if(loop_method == "api_user"):
-				return api_user()
-			return jsonify({"error":str("Need refresh to get data")})
-		else:
-			gs.set_cookie(ltuid=data_cookie[0]["ltuid"], ltoken=data_cookie[0]["ltoken"])
-			cookie_used = 0;
-	else:
-		return jsonify({"error":str(e)})
+		return jsonify({"error":str(e)}), 404
 
 if __name__ == "__main__":
     app.run()
