@@ -66,5 +66,34 @@ def api_traveler():
 	except Exception as e:
 		return jsonify({"error":str(e)}), 404
 
+
+@app.route("/wish")
+def wish():
+    query_parameters = request.args
+    auth_key = query_parameters.get("auth_key")
+    if auth_key == None:
+        return jsonify({"error":"Parameter auth_key belum dimasukkan!"})
+    try:
+        gs.set_authkey(auth_key)
+        # {100: 'Novice Wishes',
+        #  200: 'Permanent Wish',
+        #  301: 'Character Event Wish',
+        #  302: 'Weapon Event Wish'}
+        novice_banner = []
+        for i in gs.get_wish_history(100):
+            novice_banner.append(i)
+        char_banner = []
+        for i in gs.get_wish_history(301):
+            char_banner.append(i)
+        weapon_banner = []
+        for i in gs.get_wish_history(302):
+            weapon_banner.append(i)
+        permanent_banner = []
+        for i in gs.get_wish_history(200):
+            permanent_banner.append(i)
+        return jsonify({"novice_banner":novice_banner,"char_banner":char_banner,"weapon_banner":weapon_banner,"permanent_banner":permanent_banner})
+    except Exception as e:
+        return jsonify({"error":str(e)}), 404
+
 if __name__ == "__main__":
     app.run()
