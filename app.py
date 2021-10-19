@@ -66,6 +66,18 @@ def api_traveler():
 	except Exception as e:
 		return jsonify({"error":str(e)}), 404
 
+@app.route("/karakter")
+def api_karakter():
+	query_parameters = request.args
+	uid = query_parameters.get("uid")
+	if uid == None:
+		return jsonify({"error":"UID belum dimasukkan!"})
+	try:
+		data = gs.get_characters(uid)
+		return jsonify(data)
+	except Exception as e:
+		return jsonify({"error":str(e)}), 404
+
 
 @app.route("/wish")
 def wish():
