@@ -7,6 +7,8 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 gs.set_cookies(
 	{"ltuid": 119480035, "ltoken": "cnF7TiZqHAAvYqgCBoSPx5EjwezOh1ZHoqSHf7dT"},
+	{"ltuid": 28604126, "ltoken": "HxIDjzIZBwbqgneTSGK8L2zz9AhL3V2nNIbh6wYy"}, #Dohan
+	{"ltuid": 150712156, "ltoken": "9osNFLqaiEtD6HWkh9cB32Gd0QVpdYcP8zZcLDBq"}, #Adolf
 	{"ltuid": 149113841, "ltoken": "7Qbp2v4WSuQZ76zqetbJv0usM95imp9NvE6lDfW6"}, #GUI
 	{"ltuid": 25492983, "ltoken": "Dx5ibXqMljpv8rOOM1Y8MWPVlPhM1FB7khqndUWZ"}, #Ayna
 	{"ltuid": 170305200, "ltoken": "GZLBAmp58ZPkbBeKw3PTPTGLIjkK3yHdyxHhONKO"},
