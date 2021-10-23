@@ -68,6 +68,25 @@ def api_traveler():
 	except Exception as e:
 		return jsonify({"error":str(e)}), 404
 
+@app.route("/note")
+def api_note():
+	query_parameters = request.args
+	uid = query_parameters.get("uid")
+	ltoken = query_parameters.get("ltoken")
+	ltuid = query_parameters.get("ltuid")
+	if uid == None:
+		return jsonify({"error":"UID belum dimasukkan!"})
+	if ltoken == None:
+		return jsonify({"error":"ltoken belum dimasukkan!"})
+	if ltuid == None:
+		return jsonify({"error":"ltuid belum dimasukkan!"})
+	try:
+		gs.set_cookie(ltuid= ltuid, ltoken= ltoken)
+		data = gs.get_notes(uid)
+		return jsonify(data)
+	except Exception as e:
+		return jsonify({"error":str(e)}), 404
+
 @app.route("/karakter")
 def api_karakter():
 	query_parameters = request.args
