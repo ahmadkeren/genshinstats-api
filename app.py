@@ -5,22 +5,27 @@ import json
 import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
-gs.set_cookies(
-	{"ltuid": 119480035, "ltoken": "cnF7TiZqHAAvYqgCBoSPx5EjwezOh1ZHoqSHf7dT"},
-	{"ltuid": 28604126, "ltoken": "HxIDjzIZBwbqgneTSGK8L2zz9AhL3V2nNIbh6wYy"}, #Dohan
-	{"ltuid": 150712156, "ltoken": "9osNFLqaiEtD6HWkh9cB32Gd0QVpdYcP8zZcLDBq"}, #Adolf
-	{"ltuid": 149113841, "ltoken": "7Qbp2v4WSuQZ76zqetbJv0usM95imp9NvE6lDfW6"}, #GUI
-	{"ltuid": 25492983, "ltoken": "Dx5ibXqMljpv8rOOM1Y8MWPVlPhM1FB7khqndUWZ"}, #Ayna
-	{"ltuid": 170305200, "ltoken": "GZLBAmp58ZPkbBeKw3PTPTGLIjkK3yHdyxHhONKO"},
-	{"ltuid": 170299611, "ltoken": "kGhft0dTMnc7RAsjHLKTVrrGmXhblcF5lfCZJO81"},
-	{"ltuid": 170302702, "ltoken": "tEHeC8NLmf3QtXb1R7lknfo9GxiAiKMdNeKA3rMC"},
-	{"ltuid": 170306282, "ltoken": "tjiZwlRyAJTosNT3w0XE79ZlfUaVE5LtjQ9FvZaE"},
-	{"ltuid": 170306586, "ltoken": "W2f8iRR6DbXWAIvSciGBqqHizqee2iF0pi7O6NAA"},
-	{"ltuid": 96745167, "ltoken": "BRrxtAVyitJnntnbB4pnXx4NskvpUC9IWY7DIEmL"}, #Reza
-	{"ltuid": 40559632, "ltoken": "uPEFJZ0GlRnRJBhX1lRI8oLTzFZDZvXpcWYMezh5"}, #Bimbe
-	{"ltuid": 67128700, "ltoken": "PqExNu7ZIRorgTkZEZQpvmnfjhlykfRARvAnx5As"}, #Natsu
-	{"ltuid": 170306105, "ltoken": "a80Lt8Tq5czWlgbP4BvwRT0ZfhaqIpfRphZgHWAl"}
-)
+
+def setCookie():
+	gs.set_cookies(
+		{"ltuid": 119480035, "ltoken": "cnF7TiZqHAAvYqgCBoSPx5EjwezOh1ZHoqSHf7dT"},
+		{"ltuid": 28604126, "ltoken": "HxIDjzIZBwbqgneTSGK8L2zz9AhL3V2nNIbh6wYy"}, #Dohan
+		{"ltuid": 150712156, "ltoken": "9osNFLqaiEtD6HWkh9cB32Gd0QVpdYcP8zZcLDBq"}, #Adolf
+		{"ltuid": 149113841, "ltoken": "7Qbp2v4WSuQZ76zqetbJv0usM95imp9NvE6lDfW6"}, #GUI
+		{"ltuid": 25492983, "ltoken": "Dx5ibXqMljpv8rOOM1Y8MWPVlPhM1FB7khqndUWZ"}, #Ayna
+		{"ltuid": 170305200, "ltoken": "GZLBAmp58ZPkbBeKw3PTPTGLIjkK3yHdyxHhONKO"},
+		{"ltuid": 170299611, "ltoken": "kGhft0dTMnc7RAsjHLKTVrrGmXhblcF5lfCZJO81"},
+		{"ltuid": 170302702, "ltoken": "tEHeC8NLmf3QtXb1R7lknfo9GxiAiKMdNeKA3rMC"},
+		{"ltuid": 170306282, "ltoken": "tjiZwlRyAJTosNT3w0XE79ZlfUaVE5LtjQ9FvZaE"},
+		{"ltuid": 170306586, "ltoken": "W2f8iRR6DbXWAIvSciGBqqHizqee2iF0pi7O6NAA"},
+		{"ltuid": 96745167, "ltoken": "BRrxtAVyitJnntnbB4pnXx4NskvpUC9IWY7DIEmL"}, #Reza
+		{"ltuid": 40559632, "ltoken": "uPEFJZ0GlRnRJBhX1lRI8oLTzFZDZvXpcWYMezh5"}, #Bimbe
+		{"ltuid": 67128700, "ltoken": "PqExNu7ZIRorgTkZEZQpvmnfjhlykfRARvAnx5As"}, #Natsu
+		{"ltuid": 170306105, "ltoken": "a80Lt8Tq5czWlgbP4BvwRT0ZfhaqIpfRphZgHWAl"}
+	)
+
+setCookie()
+
 app = Flask(__name__)
  
 @app.route("/")
@@ -83,6 +88,7 @@ def api_note():
 	try:
 		gs.set_cookie(ltuid= ltuid, ltoken= ltoken)
 		data = gs.get_notes(uid)
+		setCookie();
 		return jsonify(data)
 	except Exception as e:
 		return jsonify({"error":str(e)}), 404
