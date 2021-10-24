@@ -105,6 +105,39 @@ def api_karakter():
 	except Exception as e:
 		return jsonify({"error":str(e)}), 404
 
+@app.route("/transaction")
+def transaction():
+	query_parameters = request.args
+	auth_key = query_parameters.get("auth_key")
+	if auth_key == None:
+		return jsonify({"error":"Parameter auth_key belum dimasukkan!"})
+	try:
+		gs.set_authkey(auth_key)
+		primogems = []
+		for i in gs.get_primogem_log():
+			primogems.append(i)
+		resin = []
+		for i in gs.get_resin_log():
+			resin.append(i)
+		crystals = []
+		for i in gs.get_crystal_log():
+			crystal.append(i)
+		artifact = []
+		for i in gs.get_artifact_log():
+			artifact.append(i)
+		weapons = []
+		for i in gs.get_weapon_log():
+			weapons.append(i)
+		return jsonify({
+			"primogems":primogems,
+			"resin":resin,
+			"crystals":crystals,
+			"artifact":artifact,
+			"weapons":weapons,
+			})
+	except Exception as e:
+		return jsonify({"error":str(e)}), 404
+
 
 @app.route("/wish")
 def wish():
