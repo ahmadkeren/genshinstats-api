@@ -93,6 +93,30 @@ def api_note():
 	except Exception as e:
 		return jsonify({"error":str(e)}), 404
 
+@app.route("/set_visibility")
+def api_visibility():
+	query_parameters = request.args
+	toggle = query_parameters.get("toggle")
+	ltoken = query_parameters.get("ltoken")
+	ltuid = query_parameters.get("ltuid")
+	if toggle == None:
+		return jsonify({"error":"Toggle on/of belum dimasukkan!"})
+	if ltoken == None:
+		return jsonify({"error":"ltoken belum dimasukkan!"})
+	if ltuid == None:
+		return jsonify({"error":"ltuid belum dimasukkan!"})
+	if toggle == "on":
+		toggle = True
+	else:
+		toggle = False
+	try:
+		gs.set_cookie(ltuid= ltuid, ltoken= ltoken)
+		data = gs.set_visibility(toggle)
+		setCookie();
+		return jsonify({"success":True})
+	except Exception as e:
+		return jsonify({"error":str(e)}), 404
+
 @app.route("/karakter")
 def api_karakter():
 	query_parameters = request.args
