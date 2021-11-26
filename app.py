@@ -1,4 +1,4 @@
-import genshinstats as gs
+from genshinstats import genshinstats as gs
 from flask import Flask, jsonify, request
 from flask import render_template
 import json
